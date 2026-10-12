@@ -55,9 +55,15 @@ else()
     unset(MALLOC CACHE)
 endif()
 
-set(MAKEJOBS ${CPU_COUNT})
+#set(MAKEJOBS ${CPU_COUNT})
+# set(MAKEJOBS 5) # uncomment this line to manually change no. of cpu
+#set(MAKEJOBS ${MAKEJOBS} CACHE STRING "Number of parallel processes to run for each package build")
+
+# 强制将下载、更新等前置阶段设为 1 个并发线程，杜绝多线程抢占 index.lock 死锁
+set(MAKEJOBS 1) 
 # set(MAKEJOBS 5) # uncomment this line to manually change no. of cpu
 set(MAKEJOBS ${MAKEJOBS} CACHE STRING "Number of parallel processes to run for each package build")
+
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set (CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/install" CACHE PATH "Default install path" FORCE )
