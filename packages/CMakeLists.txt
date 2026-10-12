@@ -2,7 +2,6 @@ set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download)
 include(${PROJECT_SOURCE_DIR}/cmake/packages_check.cmake)
 list(APPEND ep
     gmp
-    xz
     lzo
     uchardet
     libsamplerate
@@ -87,15 +86,12 @@ list(APPEND ep
     libaribcaption
     libsixel
     ffmpeg
-    ngtcp2
     nghttp3
     nghttp2
     c-ares
-    libpsl
     curl
     mpv
     mpv-release
-    mpv-packaging
     flac
     opusfile
     libopusenc
