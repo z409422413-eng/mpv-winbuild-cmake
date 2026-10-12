@@ -151,3 +151,21 @@ add_subdirectory(packages)
 add_subdirectory(toolchain)
 add_subdirectory(packages)
 
+# =================================================================
+# 终极一刀：强行从全局编译树中摘除所有已过期的、会导致死锁的网络流媒体库
+# =================================================================
+macro(remove_unwanted_package pkg_name)
+    if(TARGET ${pkg_name})
+        # 彻底让坏掉的或不需要的包失去活性
+        set_target_properties(${pkg_name} PROPERTIES EXCLUDE_FROM_ALL TRUE)
+    endif()
+endmacro()
+
+# 强制过滤掉这些引发翻车的网络与外部压缩包依赖
+remove_unwanted_package(ngtcp2)
+remove_unwanted_package(nghttp2)
+remove_unwanted_package(libpsl)
+remove_unwanted_package(xz)
+remove_unwanted_package(mpv-packaging)
+
+
