@@ -1,31 +1,15 @@
 ExternalProject_Add(mpv
     DEPENDS
         angle-headers
-        ffmpeg
+        ffmpeg              # 关联我们上面精简的 ffmpeg
         fribidi
-        lcms2
-        libarchive
         libass
-        libdvdnav
-        libdvdread
         libiconv
-        libjpeg
-        libpng
-        luajit
-        rubberband
-        uchardet
-        openal-soft
-        mujs
         vulkan
         shaderc
         libplacebo
         spirv-cross
-        vapoursynth
-        libsdl2
-        subrandr
-        libsixel
-        curl
-    GIT_REPOSITORY https://github.com/mpv-player/mpv.git
+    GIT_REPOSITORY https://github.com
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
     UPDATE_COMMAND ""
@@ -35,30 +19,38 @@ ExternalProject_Add(mpv
         --cross-file=${MESON_CROSS}
         --default-library=shared
         --prefer-static
-        -Ddebug=true
+        -Ddebug=false
         -Db_ndebug=true
         -Doptimization=3
         -Db_lto=true
         ${mpv_lto_mode}
         -Dlibmpv=true
-        -Dpdf-build=enabled
-        -Dlua=enabled
-        -Djavascript=enabled
-        -Dsdl2-gamepad=enabled
-        -Dlibarchive=enabled
-        -Dlibbluray=enabled
-        -Ddvdnav=enabled
-        -Duchardet=enabled
-        -Drubberband=enabled
-        -Dlcms2=enabled
-        -Dopenal=enabled
+        
+        # ==========================================
+        # 彻底关闭无用外壳，防止上游库死锁或找不到命令
+        # ==========================================
+        -Dpdf-build=disabled
+        -Dlua=disabled              # 关闭 Lua 脚本层
+        -Djavascript=disabled       # 关闭 JS 脚本层
+        -Dsdl2-gamepad=disabled
+        -Dlibarchive=disabled
+        -Dlibbluray=disabled
+        -Ddvdnav=disabled
+        -Duchardet=disabled
+        -Drubberband=disabled
+        -Dlcms2=disabled
+        -Dopenal=disabled
+        -Dvapoursynth=disabled
+        -Dsubrandr=disabled
+        -Dsixel=disabled
+        -Dlibcurl=disabled          # 彻底斩断网络握手，直接无视 ngtcp2 报错
+        
+        # ==========================================
+        # 开启高性能本地渲染基础
+        # ==========================================
         -Dspirv-cross=enabled
         -Dvulkan=enabled
-        -Dvapoursynth=enabled
-        -Dsubrandr=enabled
-        -Dsixel=enabled
         ${mpv_gl}
-        -Dlibcurl=enabled
         -Dc_args='-Wno-error=int-conversion'
     BUILD_COMMAND ${EXEC} LTO_JOB=1 PDB=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ""
@@ -77,7 +69,6 @@ ExternalProject_Add_Step(mpv copy-binary
     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.com                           ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv.com
     COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/etc/mpv-register.bat              ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv-register.bat
     COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/etc/mpv-unregister.bat            ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv-unregister.bat
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.pdf                           ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/doc/manual.pdf
     COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/etc/fonts/fonts.conf   ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv/fonts.conf
     ${mpv_copy_debug}
     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv-2.dll          ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv-2.dll
@@ -86,7 +77,7 @@ ExternalProject_Add_Step(mpv copy-binary
     COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/stream_cb.h    ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/stream_cb.h
     COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/render.h       ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/render.h
     COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/render_gl.h    ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/render_gl.h
-    COMMENT "Copying mpv binaries and manual"
+    COMMENT "Copying mpv binaries"
 )
 
 set(RENAME ${CMAKE_CURRENT_BINARY_DIR}/mpv-prefix/src/rename.sh)
