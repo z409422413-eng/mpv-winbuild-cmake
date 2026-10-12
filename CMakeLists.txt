@@ -147,3 +147,7 @@ message(STATUS "Target toolchain to build: ${TARGET_ARCH}")
 
 add_subdirectory(toolchain)
 add_subdirectory(packages)
+
+add_subdirectory(toolchain)
+add_subdirectory(packages)
+
